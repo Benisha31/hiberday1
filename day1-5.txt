@@ -1,0 +1,123 @@
+mymain.java
+
+public class MyMain {
+
+	public static void main(String[] args) {
+		
+		Employee emp=new Employee();
+		Scanner sc=new Scanner(System.in);
+		System.out.println("EMPLOYEE MGMT");
+		System.out.println("-------------");
+			System.out.println("Enter EmpNo:");
+			emp.setEmpno(sc.nextInt());
+			System.out.println("Enter new Emp name:");
+			emp.setName(sc.next());
+			System.out.println("Enter new city:");
+             emp.setCity(sc.next());
+             
+         	new UserCode().updateEmployee(emp);
+
+	}
+
+}
+....................................................
+usercode.java
+
+public class UserCode {
+	
+	public boolean updateEmployee(Employee bean)
+	{
+	 SessionFactory sx=new AnnotationConfiguration().configure().addAnnotatedClass(Employee.class).buildSessionFactory();
+	 Session s=sx.openSession();
+	 Transaction tx=s.beginTransaction();
+	 s.update(bean);
+	 tx.commit();
+	 System.out.println("Data saved...");
+	return true;
+	}
+
+.............................................................
+employee.java
+
+@Entity
+@Table(name="Employee")
+public class Employee {
+	
+	@Id
+	@Column(name="EmpNo")
+	int empno;
+	@Column(name="Name")
+    String name;
+	@Column(name="City")
+    String city;
+	public int getEmpno() {
+		return empno;
+	}
+	public void setEmpno(int empno) {
+		this.empno = empno;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	
+}
+...............................................................................
+hibernate.cfg.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC  
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"  
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">  
+  
+<hibernate-configuration>  
+  
+    <session-factory>  
+        <property name="hbm2ddl.auto">update</property>  
+        <property name="dialect">org.hibernate.dialect.MySQLDialect</property>  
+        <property name="connection.url">jdbc:mysql://localhost:3306/myhibernate</property>  
+        <property name="connection.username">root</property>  
+        <property name="connection.password">dsrc</property>  
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>  
+     
+      </session-factory>  
+  
+</hibernate-configuration>  
+...................................................................
+
+usercode try catch
+
+public class UserCode {
+	
+	public boolean saveDepartment(Department d)
+	{
+		
+		 SessionFactory sx=new AnnotationConfiguration().configure().addAnnotatedClass(Department.class).buildSessionFactory();
+		 Session s=sx.openSession();
+		 Transaction tx=null;
+		 try{
+		 tx=s.beginTransaction();
+		 s.update(d);
+		 tx.commit();
+		 System.out.println("Data saved...");
+		 }catch(HibernateException e){
+			 if(tx!=null) 
+				 tx.rollback();
+			 e.printStackTrace();
+		 }finally{
+			 s.close();
+		 }
+		return true;
+		}
+
+	}
+
+.............................................................................
